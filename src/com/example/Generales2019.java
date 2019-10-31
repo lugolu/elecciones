@@ -258,7 +258,7 @@ public class Generales2019 {
 	}
 
 	private static void write (String s, boolean append) {
-		File logFile = new File("salida.txt");
+		File logFile = new File("incidencias.txt");
 
 		try (BufferedWriter bw = new BufferedWriter(new FileWriter(logFile, append)))
 		{
