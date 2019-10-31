@@ -71,34 +71,35 @@ public class Generales2019 {
 			for (Provincia provincia : provincias) {
 				System.out.println(provincia.getN());
 				try {
-					//					if ("10".equals(provincia.getCc())
-					//							|| "16".equals(provincia.getCc())
-					//							|| "24".equals(provincia.getCc())
-					//							|| "09".equals(provincia.getCc())
-					//							|| "11".equals(provincia.getCc())
-					//							|| "03".equals(provincia.getCc())
-					//							|| "20".equals(provincia.getCc())
-					//							|| "17".equals(provincia.getCc())
-					//							|| "14".equals(provincia.getCc())
-					//							|| "21".equals(provincia.getCc())
-					//							|| "22".equals(provincia.getCc())
-					//							|| "04".equals(provincia.getCc())
-					//							|| "13".equals(provincia.getCc())
-					//							|| "18".equals(provincia.getCc())
-					//							|| "19".equals(provincia.getCc())
-					//							|| "05".equals(provincia.getCc())
-					//							|| "15".equals(provincia.getCc())
-					//							|| "06".equals(provincia.getCc())
-					//							|| "08".equals(provincia.getCc())
-					//							|| "01".equals(provincia.getCc())
-					//							|| "23".equals(provincia.getCc())
-					//							|| "07".equals(provincia.getCc())
-					//							|| "02".equals(provincia.getCc())
-					//							|| "12".equals(provincia.getCc())
-					//							) {
-					//						continue;
-					//					}
-
+					/*
+					if ("10".equals(provincia.getCc())
+							|| "16".equals(provincia.getCc())
+							|| "24".equals(provincia.getCc())
+							|| "09".equals(provincia.getCc())
+							|| "11".equals(provincia.getCc())
+							|| "03".equals(provincia.getCc())
+							|| "20".equals(provincia.getCc())
+							|| "17".equals(provincia.getCc())
+							|| "14".equals(provincia.getCc())
+							|| "21".equals(provincia.getCc())
+							|| "22".equals(provincia.getCc())
+							|| "04".equals(provincia.getCc())
+							|| "13".equals(provincia.getCc())
+							|| "18".equals(provincia.getCc())
+							|| "19".equals(provincia.getCc())
+							|| "05".equals(provincia.getCc())
+							|| "15".equals(provincia.getCc())
+							|| "06".equals(provincia.getCc())
+							|| "08".equals(provincia.getCc())
+							|| "01".equals(provincia.getCc())
+							|| "23".equals(provincia.getCc())
+							|| "07".equals(provincia.getCc())
+							|| "02".equals(provincia.getCc())
+							|| "12".equals(provincia.getCc())
+							) {
+						continue;
+					}
+					 */
 					if (provincia.getCc().length() < 4) {
 						for (String s : provincia.getChd()) {
 							try {
@@ -182,8 +183,14 @@ public class Generales2019 {
 	private static String response(String dir) throws IOException, InterruptedException {
 		instances++;
 
+		Thread.sleep(10);
+
 		if ((instances % 50) == 0) {
 			System.out.print(".");
+		}
+		if ((instances % 150) == 0) {
+			Thread.sleep(1000);
+			System.out.print("zzz");
 		}
 
 		for (int i=0; i<100; i++) {
@@ -207,6 +214,7 @@ public class Generales2019 {
 				return response.toString();
 			} catch (Exception e) {
 				if (e.getMessage().contains("403 for URL")) {
+					//					System.out.println(e.getMessage());
 					throw new IOException("SIN RESULTADOS");
 				}
 				System.out.print(":");
