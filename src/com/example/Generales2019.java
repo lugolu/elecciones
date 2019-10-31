@@ -145,7 +145,11 @@ public class Generales2019 {
 																}
 															}
 														} catch (IOException ex) {
-															print(provincia, seccion, circuito, l, m.getN(), "SIN RESULTADOS", 0D);
+															if ("timeout".equals(ex.getMessage())) {
+																print(provincia, seccion, circuito, l, m.getN(), "TIMEOUT", 0D);
+															} else {
+																print(provincia, seccion, circuito, l, m.getN(), "SIN RESULTADOS", 0D);
+															}
 														}
 													}
 												} catch (Exception e) {
