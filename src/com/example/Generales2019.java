@@ -32,7 +32,7 @@ public class Generales2019 {
 		double porcentaje = 0;
 
 		try {
-			String str = "provincia|seccion|circuito|local|mesa|partido|porcentaje\n";
+			String str = "provincia|seccion|circuito|local|mesa|partido/motivo|porcentaje\n";
 			write(str, false);
 
 			String dir = "https://www.resultados2019.gob.ar/assets/data/parties.json";
@@ -56,7 +56,6 @@ public class Generales2019 {
 			List<Provincia> tmp = gson.fromJson(responseProvincias, listTypeProvincia);
 			List<Provincia> locales = null;
 			List<Provincia> mesas = null;
-			//			System.out.println(res);
 			Map<String, Provincia> mapProvincias = new HashMap<String, Provincia>();
 			for (Provincia p : tmp) {
 				mapProvincias.put(p.getC(), p);
@@ -70,6 +69,7 @@ public class Generales2019 {
 			Provincia circuito = null;
 
 			for (Provincia provincia : provincias) {
+				System.out.println(provincia.getN());
 				try {
 					//					if ("10".equals(provincia.getCc())
 					//							|| "16".equals(provincia.getCc())
@@ -133,42 +133,38 @@ public class Generales2019 {
 															}
 
 															if (porcentaje < 100D) {
-																print(provincia, seccion, circuito, l, m.getN(), "INCIDENCIA", porcentaje);
+																print(provincia.getN(), seccion.getN(), circuito.getN(), l.getN(), m.getN(), "INCIDENCIA", porcentaje);
 															}
 															else {
 																for (R r : res.getRs()) {
 																	if (r.getCc() == 845) {
 																		if ((r.getPc() == 4 || r.getPc() == 66) && (r.getPorc() > 75D || r.getPorc() < 20D)) {
-																			print(provincia, seccion, circuito, l, m.getN(), map.get(r.getPc()), r.getPorc());
+																			print(provincia.getN(), seccion.getN(), circuito.getN(), l.getN(), m.getN(), map.get(r.getPc()), r.getPorc());
 																		}
 																	}
 																}
 															}
 														} catch (IOException ex) {
-															if ("timeout".equals(ex.getMessage())) {
-																print(provincia, seccion, circuito, l, m.getN(), "TIMEOUT", 0D);
-															} else {
-																print(provincia, seccion, circuito, l, m.getN(), "SIN RESULTADOS", 0D);
-															}
+															print(provincia.getN(), seccion.getN(), circuito.getN(), l.getN(), m.getN(), ex.getMessage(), 0D);
 														}
 													}
-												} catch (Exception e) {
-													System.err.println(provincia.getN() + " " + seccion.getN() + " "+circuito.getN() + "."+l+".");
+												} catch (Exception ex) {
+													print(provincia.getN(), seccion.getN(), circuito.getN(), l.getN(), "", ex.getMessage(), 0D);
 												}
 											}
-										} catch (Exception e) {
-											System.err.println(provincia.getN() + " " + seccion.getN() + "."+circuito+".");
+										} catch (Exception ex) {
+											print(provincia.getN(), seccion.getN(), circuito.getN(), "", "", ex.getMessage(), 0D);
 										}
 									}
 								}
-							} catch (Exception e) {
-								System.err.println(provincia.getN() + " " + "."+seccion+".");
+							} catch (Exception ex) {
+								print(provincia.getN(), seccion.getN(), "", "", "", ex.getMessage(), 0D);
 							}
 							System.out.println(instances);
 						}
 					}
-				} catch (Exception e) {
-					System.err.println(provincia);
+				} catch (Exception ex) {
+					print(provincia.getN(), "", "", "", "", ex.getMessage(), 0D);
 				}
 				System.out.println(instances);
 			}
@@ -177,8 +173,8 @@ public class Generales2019 {
 		}
 	}
 
-	private static void print(Provincia provincia, Provincia seccion, Provincia circuito, Provincia local, String mesa, String partido, double porcentaje) {
-		String s = provincia.getN() + "|" + seccion.getN() + "|" + circuito.getN() + "|" + local.getN() + "|" + mesa + "|" + partido + "|" + porcentaje;
+	private static void print(String provincia, String seccion, String circuito, String local, String mesa, String partido, double porcentaje) {
+		String s = provincia + "|" + seccion + "|" + circuito + "|" + local + "|" + mesa + "|" + partido + "|" + porcentaje;
 		write(s + "\n", true);
 	}
 
@@ -186,7 +182,11 @@ public class Generales2019 {
 	private static String response(String dir) throws IOException, InterruptedException {
 		instances++;
 
-		for (int i=0; i<25; i++) {
+		if ((instances % 50) == 0) {
+			System.out.print(".");
+		}
+
+		for (int i=0; i<100; i++) {
 			try {
 				URL url = new URL(dir);
 				HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -200,15 +200,22 @@ public class Generales2019 {
 					response.append(inputLine);
 				}
 
+				if (i > 0) {
+					System.out.println();
+				}
+
 				return response.toString();
 			} catch (Exception e) {
-				System.out.print(".");
-				Thread.sleep(2500);
+				if (e.getMessage().contains("403 for URL")) {
+					throw new IOException("SIN RESULTADOS");
+				}
+				System.out.print(":");
+				Thread.sleep(1000);
 			}
 		}
 
-		System.out.println();
-		throw new IOException("timeout");
+		System.out.println(dir);
+		throw new IOException("TIMEOUT");
 	}
 
 	private static void write (String s, boolean append) {
