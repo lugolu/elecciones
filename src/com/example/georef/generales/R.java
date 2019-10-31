@@ -73,9 +73,13 @@ public class R {
 		this.per = per;
 	}
 
+	public Double getPorc() {
+		return Double.parseDouble(per);
+	}
+
 	@Override
 	public String toString() {
-		return "R [cc=" + cc + ", pc=" + pc + ", boc=" + boc + ", v=" + v + ", tot=" + tot + ", per=" + per + "]";
+		return "R [cc=" + cc + ", pc=" + pc + ", boc=" + boc + ", v=" + v + ", tot=" + tot + ", per=" + per + ", porc=" + getPorc() + "]";
 	}
 
 }

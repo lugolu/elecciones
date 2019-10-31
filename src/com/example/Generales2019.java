@@ -2,6 +2,9 @@
 package com.example;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
@@ -12,8 +15,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.example.georef.generales.General;
 import com.example.georef.generales.Partido;
 import com.example.georef.generales.Provincia;
+import com.example.georef.generales.R;
+import com.example.georef.generales.St;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -26,6 +32,9 @@ public class Generales2019 {
 		double porcentaje = 0;
 
 		try {
+			String str = "provincia|seccion|circuito|local|mesa|partido|porcentaje\n";
+			write(str, false);
+
 			String dir = "https://www.resultados2019.gob.ar/assets/data/parties.json";
 			String responsePartidos = response (dir);
 
@@ -36,6 +45,7 @@ public class Generales2019 {
 			Map<Integer, String> map = new HashMap<Integer, String>();
 
 			for (Partido p : partidos) {
+				System.out.println(p.getPc() + "\t" + p.getPn());
 				map.put(p.getPc(), p.getPn());
 			}
 
@@ -112,68 +122,90 @@ public class Generales2019 {
 											String responseLocales = response (dir);
 											locales = gson.fromJson(responseLocales, listTypeProvincia);
 
-											//											for (Provincia l : locales) {
-											//												printLocal = false;
-											//
-											//												try {
-											//													dir = "https://www.resultados2019.gob.ar/assets/data/" + l.getChp();
-											//													String responseMesas = response (dir);
-											//													mesas = gson.fromJson(responseMesas, listTypeProvincia);
-											//
-											//													for (Provincia m : mesas) {
-											//														try {
-											//															dir = "https://www.resultados2019.gob.ar/assets/data/totalized_results/" + m.getRf();
-											//															String responseResultados = response (dir);
-											//															General res = gson.fromJson(responseResultados.toString(), General.class);
-											//
-											//															for (St st : res.getSt()) {
-											//																porcentaje = Double.parseDouble(st.getPPer());
-											//															}
-											//
-											//															if (porcentaje < 100D) {
-											//																print(printProvincia, printSeccion, printCircuito, printLocal, provincia, seccion, circuito, l, "\t\t\t\tmesa: " + l.getN() + " " + m.getN() + " < 100 (" + porcentaje + ") " + dir);
-											//																printProvincia = true;
-											//																printSeccion = true;
-											//																printCircuito = true;
-											//																printLocal = true;
-											//															}
-											//														} catch (IOException ex) {
-											//															print(printProvincia, printSeccion, printCircuito, printLocal, provincia, seccion, circuito, l, "\t\t\t\tmesa: " + l.getN() + " " + m.getN() + " " + dir);
-											//															printProvincia = true;
-											//															printSeccion = true;
-											//															printCircuito = true;
-											//															printLocal = true;
-											//														}
-											//													}
-											//												} catch (Exception e) {
-											//													e.printStackTrace();
-											//													System.err.println("."+l+".");
-											//												}
-											//												//												System.out.println(instances);
-											//											}
+											for (Provincia l : locales) {
+												printLocal = false;
+
+												try {
+													dir = "https://www.resultados2019.gob.ar/assets/data/" + l.getChp();
+													String responseMesas = response (dir);
+													mesas = gson.fromJson(responseMesas, listTypeProvincia);
+
+													for (Provincia m : mesas) {
+														try {
+															dir = "https://www.resultados2019.gob.ar/assets/data/totalized_results/" + m.getRf();
+															String responseResultados = response (dir);
+															General res = gson.fromJson(responseResultados.toString(), General.class);
+
+
+															for (St st : res.getSt()) {
+																porcentaje = Double.parseDouble(st.getPPer());
+															}
+
+															if (porcentaje < 100D) {
+																//																print(printProvincia, printSeccion, printCircuito, printLocal, provincia, seccion, circuito, l, "\t\t\t\tmesa: " + m.getN() + " < 100 (" + porcentaje + ") " + dir);
+																print(provincia, seccion, circuito, l, m.getN(), "INCIDENCIA", porcentaje);
+																printProvincia = true;
+																printSeccion = true;
+																printCircuito = true;
+																printLocal = true;
+															}
+															else {
+																for (R r : res.getRs()) {
+																	if (r.getCc() == 845) {
+																		if ((r.getPc() == 4 || r.getPc() == 66) && (r.getPorc() > 75D || r.getPorc() < 20D)) {
+																			//																			print(printProvincia, printSeccion, printCircuito, printLocal, provincia, seccion, circuito, l, "\t\t\t\tresultado: " + m.getN() + " " + map.get(r.getPc()) + " (" + r.getPorc() + ") ");
+																			print(provincia, seccion, circuito, l, m.getN(), map.get(r.getPc()), r.getPorc());
+																			printProvincia = true;
+																			printSeccion = true;
+																			printCircuito = true;
+																			printLocal = true;
+																		}
+																	}
+																}
+															}
+														} catch (IOException ex) {
+															//															print(printProvincia, printSeccion, printCircuito, printLocal, provincia, seccion, circuito, l, "\t\t\t\tmesa: " + m.getN() + " ");
+															print(provincia, seccion, circuito, l, m.getN(), "SIN RESULTADOS", 0D);
+															printProvincia = true;
+															printSeccion = true;
+															printCircuito = true;
+															printLocal = true;
+														}
+													}
+												} catch (Exception e) {
+													System.err.println(provincia.getN() + " " + seccion.getN() + " "+circuito.getN() + "."+l+".");
+												}
+												//												System.out.println(instances);
+											}
 										} catch (Exception e) {
-											e.printStackTrace();
+											//											e.printStackTrace();
 											System.err.println(provincia.getN() + " " + seccion.getN() + "."+circuito+".");
 										}
 										//										System.out.println(instances);
 									}
 								}
 							} catch (Exception e) {
-								e.printStackTrace();
+								//								e.printStackTrace();
 								System.err.println(provincia.getN() + " " + "."+seccion+".");
 							}
-							System.out.println(provincia.getN() + " " + seccion.getN() + " " + instances);
+							System.out.println(instances);
 						}
 					}
 				} catch (Exception e) {
-					e.printStackTrace();
+					//					e.printStackTrace();
 					System.err.println(provincia);
 				}
-				System.out.println(provincia.getN() + " " + instances);
+				System.out.println(instances);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	private static void print(Provincia provincia, Provincia seccion, Provincia circuito, Provincia local, String mesa, String partido, double porcentaje) {
+		String s = provincia.getN() + "|" + seccion.getN() + "|" + circuito.getN() + "|" + local.getN() + "|" + mesa + "|" + partido + "|" + porcentaje;
+		System.out.println(s);
+		write(s + "\n", true);
 	}
 
 	private static void print(boolean printProvincia, boolean printSeccion, boolean printCircuito, boolean printLocal,
@@ -195,8 +227,10 @@ public class Generales2019 {
 	}
 
 	private static long instances;
-	private static String response(String dir) throws IOException {
+	private static String response(String dir) throws IOException, InterruptedException {
 		instances++;
+
+		Thread.sleep(10L);
 
 		URL url = new URL(dir);
 		HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -220,6 +254,19 @@ public class Generales2019 {
 			return "0" + number;
 		} else {
 			return "" + number;
+		}
+	}
+
+	private static void write (String s, boolean append) {
+		File logFile = new File("salida.txt");
+
+		try (BufferedWriter bw = new BufferedWriter(new FileWriter(logFile, append)))
+		{
+			bw.write(s);
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
 		}
 	}
 
