@@ -69,51 +69,43 @@ public class Generales2019 {
 			Provincia seccion = null;
 			Provincia circuito = null;
 
-			boolean printProvincia;
-			boolean printSeccion;
-			boolean printCircuito;
-			boolean printLocal;
-
 			for (Provincia provincia : provincias) {
-				printProvincia = false;
-				/*
-				1		Jujuy
-				1596	Rio Negro
-				1597	Tierra del Fuego
-				2		Formosa
-				2419	La Pampa
-				2420	Catamarca
-				3		Santa Cruz
-				3204	Salta
-				3989	Misiones
-				3990	Santa Fe
-				3991	Santiago del Estero
-				4		Cordoba
-				4791	Mendoza
-				4792	San Juan
-				4793	San Luis
-				5		Corrientes
-				5586	Neuquen
-				5587	Chaco
-				5588	Entre Rios
-				5589	Ciudad Autónoma de Buenos Aires
-				5590	Tucuman
-				5591	Chubut
-				6		Buenos Aires
-				814		La Rioja
-				 */
 				try {
+					//					if ("10".equals(provincia.getCc())
+					//							|| "16".equals(provincia.getCc())
+					//							|| "24".equals(provincia.getCc())
+					//							|| "09".equals(provincia.getCc())
+					//							|| "11".equals(provincia.getCc())
+					//							|| "03".equals(provincia.getCc())
+					//							|| "20".equals(provincia.getCc())
+					//							|| "17".equals(provincia.getCc())
+					//							|| "14".equals(provincia.getCc())
+					//							|| "21".equals(provincia.getCc())
+					//							|| "22".equals(provincia.getCc())
+					//							|| "04".equals(provincia.getCc())
+					//							|| "13".equals(provincia.getCc())
+					//							|| "18".equals(provincia.getCc())
+					//							|| "19".equals(provincia.getCc())
+					//							|| "05".equals(provincia.getCc())
+					//							|| "15".equals(provincia.getCc())
+					//							|| "06".equals(provincia.getCc())
+					//							|| "08".equals(provincia.getCc())
+					//							|| "01".equals(provincia.getCc())
+					//							|| "23".equals(provincia.getCc())
+					//							|| "07".equals(provincia.getCc())
+					//							|| "02".equals(provincia.getCc())
+					//							|| "12".equals(provincia.getCc())
+					//							) {
+					//						continue;
+					//					}
+
 					if (provincia.getCc().length() < 4) {
 						for (String s : provincia.getChd()) {
-							printSeccion = false;
-							//							System.out.println(s);
-
 							try {
 								seccion = mapProvincias.get(s);
 
 								if (seccion.getChd() != null) {
 									for (String c : seccion.getChd()) {
-										printCircuito = false;
 
 										try {
 											circuito = mapProvincias.get(c);
@@ -123,7 +115,6 @@ public class Generales2019 {
 											locales = gson.fromJson(responseLocales, listTypeProvincia);
 
 											for (Provincia l : locales) {
-												printLocal = false;
 
 												try {
 													dir = "https://www.resultados2019.gob.ar/assets/data/" + l.getChp();
@@ -142,57 +133,37 @@ public class Generales2019 {
 															}
 
 															if (porcentaje < 100D) {
-																//																print(printProvincia, printSeccion, printCircuito, printLocal, provincia, seccion, circuito, l, "\t\t\t\tmesa: " + m.getN() + " < 100 (" + porcentaje + ") " + dir);
 																print(provincia, seccion, circuito, l, m.getN(), "INCIDENCIA", porcentaje);
-																printProvincia = true;
-																printSeccion = true;
-																printCircuito = true;
-																printLocal = true;
 															}
 															else {
 																for (R r : res.getRs()) {
 																	if (r.getCc() == 845) {
 																		if ((r.getPc() == 4 || r.getPc() == 66) && (r.getPorc() > 75D || r.getPorc() < 20D)) {
-																			//																			print(printProvincia, printSeccion, printCircuito, printLocal, provincia, seccion, circuito, l, "\t\t\t\tresultado: " + m.getN() + " " + map.get(r.getPc()) + " (" + r.getPorc() + ") ");
 																			print(provincia, seccion, circuito, l, m.getN(), map.get(r.getPc()), r.getPorc());
-																			printProvincia = true;
-																			printSeccion = true;
-																			printCircuito = true;
-																			printLocal = true;
 																		}
 																	}
 																}
 															}
 														} catch (IOException ex) {
-															//															print(printProvincia, printSeccion, printCircuito, printLocal, provincia, seccion, circuito, l, "\t\t\t\tmesa: " + m.getN() + " ");
 															print(provincia, seccion, circuito, l, m.getN(), "SIN RESULTADOS", 0D);
-															printProvincia = true;
-															printSeccion = true;
-															printCircuito = true;
-															printLocal = true;
 														}
 													}
 												} catch (Exception e) {
 													System.err.println(provincia.getN() + " " + seccion.getN() + " "+circuito.getN() + "."+l+".");
 												}
-												//												System.out.println(instances);
 											}
 										} catch (Exception e) {
-											//											e.printStackTrace();
 											System.err.println(provincia.getN() + " " + seccion.getN() + "."+circuito+".");
 										}
-										//										System.out.println(instances);
 									}
 								}
 							} catch (Exception e) {
-								//								e.printStackTrace();
 								System.err.println(provincia.getN() + " " + "."+seccion+".");
 							}
 							System.out.println(instances);
 						}
 					}
 				} catch (Exception e) {
-					//					e.printStackTrace();
 					System.err.println(provincia);
 				}
 				System.out.println(instances);
@@ -204,57 +175,36 @@ public class Generales2019 {
 
 	private static void print(Provincia provincia, Provincia seccion, Provincia circuito, Provincia local, String mesa, String partido, double porcentaje) {
 		String s = provincia.getN() + "|" + seccion.getN() + "|" + circuito.getN() + "|" + local.getN() + "|" + mesa + "|" + partido + "|" + porcentaje;
-		//		System.out.println(s);
 		write(s + "\n", true);
-	}
-
-	private static void print(boolean printProvincia, boolean printSeccion, boolean printCircuito, boolean printLocal,
-			Provincia p, Provincia seccion, Provincia circuito, Provincia local, String string) {
-		if (!printProvincia) {
-			System.out.println(p.getN());
-		}
-		if (!printSeccion) {
-			System.out.println("\t" + seccion.getN());
-		}
-		if (!printCircuito) {
-			System.out.println("\t\t" + circuito.getN());
-		}
-		if (!printLocal) {
-			System.out.println("\t\t\t" + local.getN());
-		}
-
-		System.err.println(string);
 	}
 
 	private static long instances;
 	private static String response(String dir) throws IOException, InterruptedException {
 		instances++;
 
-		Thread.sleep(10L);
+		for (int i=0; i<25; i++) {
+			try {
+				URL url = new URL(dir);
+				HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
-		URL url = new URL(dir);
-		HttpURLConnection con = (HttpURLConnection) url.openConnection();
+				BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+				StringBuffer response = new StringBuffer();
 
-		BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-		StringBuffer response = new StringBuffer();
+				String inputLine = null;
 
-		String inputLine = null;
+				while ((inputLine = in.readLine()) != null) {
+					response.append(inputLine);
+				}
 
-		while ((inputLine = in.readLine()) != null) {
-			response.append(inputLine);
+				return response.toString();
+			} catch (Exception e) {
+				System.out.print(".");
+				Thread.sleep(2500);
+			}
 		}
 
-		//		System.out.println(response.length());
-
-		return response.toString();
-	}
-
-	private static String lpad (int number, int pos) {
-		if (number < 10) {
-			return "0" + number;
-		} else {
-			return "" + number;
-		}
+		System.out.println();
+		throw new IOException("timeout");
 	}
 
 	private static void write (String s, boolean append) {
