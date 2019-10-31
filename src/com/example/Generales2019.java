@@ -204,7 +204,7 @@ public class Generales2019 {
 
 	private static void print(Provincia provincia, Provincia seccion, Provincia circuito, Provincia local, String mesa, String partido, double porcentaje) {
 		String s = provincia.getN() + "|" + seccion.getN() + "|" + circuito.getN() + "|" + local.getN() + "|" + mesa + "|" + partido + "|" + porcentaje;
-		System.out.println(s);
+		//		System.out.println(s);
 		write(s + "\n", true);
 	}
 
