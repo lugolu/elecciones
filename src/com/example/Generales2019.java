@@ -156,18 +156,21 @@ public class Generales2019 {
 										} catch (Exception ex) {
 											print(provincia.getN(), seccion.getN(), circuito.getN(), "", "", ex.getMessage(), 0D);
 										}
+										Thread.sleep(5000L);
 									}
 								}
 							} catch (Exception ex) {
 								print(provincia.getN(), seccion.getN(), "", "", "", ex.getMessage(), 0D);
 							}
 							System.out.println(instances);
+							Thread.sleep(5000L);
 						}
 					}
 				} catch (Exception ex) {
 					print(provincia.getN(), "", "", "", "", ex.getMessage(), 0D);
 				}
 				System.out.println(instances);
+				Thread.sleep(5000L);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
